@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Demo Shop — Selenium Practice</title>
+<style>
+body{font-family:Arial,sans-serif;margin:32px;background:#f5f7fb;color:#202735}
+h1{margin-bottom:4px}.muted{color:#5c667a}
+.controls{display:flex;gap:12px;flex-wrap:wrap;background:white;padding:16px;border-radius:10px;margin:20px 0}
+input,select,button{padding:10px;border:1px solid #cbd2df;border-radius:6px;font-size:14px}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.product{background:white;padding:18px;border-radius:10px;border:1px solid #e1e6ef}
+.price{font-weight:bold;color:#145c39}.category{font-size:12px;color:#5c667a}
+button{cursor:pointer;background:#175cd3;color:white;border:0}
+button:disabled{background:#9ca3af;cursor:default}
+#results{margin:14px 0;font-weight:bold}
+</style>
+</head>
+<body>
+<h1>Demo Shop</h1>
+<p class="muted">Local practice storefront for Selenium search and filtering. No real products or payments.</p>
+<div class="controls">
+  <input id="search" type="search" placeholder="Search products">
+  <select id="category">
+    <option value="">All categories</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Home">Home</option>
+    <option value="Clothing">Clothing</option>
+  </select>
+  <label>Max price (₹)
+    <input id="max-price" type="number" min="0" placeholder="Any" style="width:100px">
+  </label>
+</div>
+<div id="results" aria-live="polite">Showing 6 products</div>
+<div id="products" class="product-grid">
+  <article class="product" data-name="wireless headphones" data-category="Electronics" data-price="2499">
+    <h2>Wireless Headphones</h2><p class="category">Electronics</p><p class="price">₹2,499</p><button>Add to cart</button>
+  </article>
+  <article class="product" data-name="mechanical keyboard" data-category="Electronics" data-price="3499">
+    <h2>Mechanical Keyboard</h2><p class="category">Electronics</p><p class="price">₹3,499</p><button>Add to cart</button>
+  </article>
+  <article class="product" data-name="coffee mug" data-category="Home" data-price="299">
+    <h2>Coffee Mug</h2><p class="category">Home</p><p class="price">₹299</p><button>Add to cart</button>
+  </article>
+  <article class="product" data-name="desk lamp" data-category="Home" data-price="899">
+    <h2>Desk Lamp</h2><p class="category">Home</p><p class="price">₹899</p><button>Add to cart</button>
+  </article>
+  <article class="product" data-name="cotton t-shirt" data-category="Clothing" data-price="599">
+    <h2>Cotton T-Shirt</h2><p class="category">Clothing</p><p class="price">₹599</p><button>Add to cart</button>
+  </article>
+  <article class="product" data-name="running shoes" data-category="Clothing" data-price="2799">
+    <h2>Running Shoes</h2><p class="category">Clothing</p><p class="price">₹2,799</p><button>Add to cart</button>
+  </article>
+</div>
+<script>
+const search = document.querySelector('#search');
+const category = document.querySelector('#category');
+const maxPrice = document.querySelector('#max-price');
+const cards = [...document.querySelectorAll('.product')];
+function filterProducts(){
+  const term = search.value.toLowerCase().trim();
+  const cat = category.value;
+  const max = maxPrice.value === '' ? Infinity : Number(maxPrice.value);
+  let count = 0;
+  cards.forEach(card => {
+    const visible = card.dataset.name.includes(term) &&
+      (!cat || card.dataset.category === cat) &&
+      Number(card.dataset.price) <= max;
+    card.hidden = !visible;
+    if(visible) count++;
+  });
+  document.querySelector('#results').textContent = `Showing ${count} product${count===1?'':'s'}`;
+}
+[search, category, maxPrice].forEach(el => el.addEventListener('input', filterProducts));
+cards.forEach(card => card.querySelector('button').addEventListener('click', () => {
+  card.querySelector('button').textContent = 'Added';
+  card.querySelector('button').disabled = true;
+}));
+</script>
+</body>
+</html>
